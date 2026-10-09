@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Check versions
+echo "Fetching available Home Assistant versions..."
+AVAILABLE_VERSIONS=$(curl -s https://pypi.org/pypi/homeassistant/json | jq -r '.releases | keys | .[]' | sort -V)
+
+if [[ -z "$AVAILABLE_VERSIONS" ]]; then
+  echo "Error: Could not fetch available versions."
+  exit 1
+fi
+
+# Show available versions
+echo "Available versions:"
+echo "$AVAILABLE_VERSIONS"
+
+read -p "What HA Version? " VERSION
+
+if [[ -z "$VERSION" ]]; then
+  echo "Error: No version provided."
+  exit 1
+fi
+if ! grep -qxF "$VERSION" <<< "$AVAILABLE_VERSIONS"; then
+  echo "Error: '$VERSION' is not an available Home Assistant version."
+  exit 1
+fi
+
+echo "Installing ${VERSION}!"
+
+
+cd "$(dirname "$0")/.."
+
+# Pin the requested Home Assistant version in the lockfile, then sync.
+uv lock --upgrade-package "homeassistant==$VERSION"
+uv sync
+
+echo "Done."

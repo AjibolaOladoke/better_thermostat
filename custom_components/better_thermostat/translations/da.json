@@ -1,0 +1,523 @@
+{
+  "title": "Better Thermostat",
+  "config": {
+    "step": {
+      "user": {
+        "description": "Konfigurer din Better Thermostat til at integrere med Home Assistant\n\n**Detaljerede oplysninger:** {docs_url}",
+        "data": {
+          "name": "Navn",
+          "thermostat": "Den rigtige termostat",
+          "cooler": "Køleenhed (valgfri)",
+          "min_cooler_resend_interval": "Minimum sekunder mellem gentagne kølekommandoer (0 = deaktiveret)",
+          "temperature_sensor": "Temperatur måler",
+          "humidity_sensor": "Fugtighedssensor",
+          "window_sensors": "Vinduessensor",
+          "door_sensors": "Dørsensor",
+          "off_temperature": "Udetemperaturen, når termostaten slukker",
+          "tolerance": "Tolerancen for at forhindre, at termostaten tænder og slukker for ofte.",
+          "window_off_delay": "Forsinkelse, før termostaten slukker, når vinduet er åbent, og tændt, når vinduet er lukket",
+          "window_off_delay_after": "Forsinkelse, før termostaten tænder, når vinduet er lukket",
+          "door_off_delay": "Forsinkelse, før termostaten slukker, når døren er åben",
+          "door_off_delay_after": "Forsinkelse, før termostaten tænder, når døren er lukket",
+          "outdoor_sensor": "Hvis du har en udeføler, kan du bruge den til at få udetemperaturen",
+          "weather": "Din vejrentitet for at få udendørstemperaturen",
+          "target_temp_min": "Mål minimum temperatur",
+          "target_temp_max": "Mål maksimum temperatur",
+          "target_temp_step": "Trin for måltemperatur",
+          "presets": "Aktiverede forudindstillinger"
+        },
+        "data_description": {
+          "presets": "Vælg de forudindstillinger, der skal være tilgængelige for denne termostat."
+        }
+      },
+      "advanced": {
+        "description": "Avanceret konfiguration {trv}\n\n**Detaljerede oplysninger:** {docs_url}",
+        "data": {
+          "protect_overheating": "Overophedningsbeskyttelse?",
+          "heat_auto_swapped": "Hvis auto betyder varme for din TRV og du vil bytte det",
+          "child_lock": "Ignorer alle input på TRV som en børnesikring",
+          "homematicip": "Hvis du bruger HomematicIP, bør du aktivere dette for at bremse anmodningerne for at forhindre arbejdscyklus",
+          "valve_maintenance": "Hvis din termostat ikke har nogen egen vedligeholdelsestilstand, kan du bruge denne",
+          "calibration": "Den slags kalibrering du vil bruge",
+          "calibration_mode": "Kalibreringstilstand",
+          "no_off_system_mode": "Hvis din TRV ikke kan håndtere den slukkede tilstand, kan du aktivere denne for at bruge måltemperatur 5°C i stedet"
+        },
+        "data_description": {
+          "protect_overheating": "Nogle TRV'er lukker ikke ventilen helt, når temperaturen er nået. Eller radiatoren har meget hvilevarme. Dette kan forårsage overophedning. Denne mulighed kan forhindre dette.",
+          "calibration_mode": "Hvordan kalibreringen skal beregnes\n***Normal***: I denne tilstand er TRV's interne temperaturføler fastgjort af den eksterne temperaturføler.\n***Aggressiv***: I denne tilstand er TRV's interne temperaturføler fikseret af den eksterne temperaturføler, men indstillet meget lavere/højere for at få et hurtigere løft.\n***AI-tidsbaseret***: I denne tilstand er TRV's interne temperatursensor fastsat af den eksterne temperatursensor, men værdien beregnes af en brugerdefineret algoritme for at forbedre TRV's interne algoritme.",
+          "calibration": "Hvordan kalibreringen skal anvendes på TRV (Target temp or offset)\n***Måltemperaturbaseret***: Anvend kalibreringen til måltemperaturen.\n***Offset-baseret***: Anvend kalibreringen til offset."
+        }
+      },
+      "confirm": {
+        "title": "Bekræft tilføjelse af en Better Thermostat",
+        "description": "Du er ved at tilføje {name} til Home Assistant.\nMed {trv} som en rigtige termostat"
+      }
+    },
+    "error": {
+      "failed": "Noget gik galt.",
+      "no_name": "Indtast venligst et navn.",
+      "no_heater": "Vælg venligst mindst én rigtig termostat.",
+      "no_off_mode": "Din enhed er meget speciel og har ingen slukket tilstand :(\nDet virker alligevel, men du skal oprette en automatisering, der passer til dine specialer baseret på enhedsbegivenhederne",
+      "target_temp_min_above_max": "Mål minimumstemperaturen må ikke overstige mål maksimumstemperaturen.",
+      "no_outside_temp": "Du har ingen udetemperaturføler. Better Thermostat vil bruge vejret i stedet.",
+      "no_data": "Ingen data blev modtaget. Prøv venligst igen."
+    },
+    "abort": {
+      "single_instance_allowed": "Kun en enkelt termostat for hver virkelige er tilladt.",
+      "no_devices_found": "Der blev ikke fundet nogen termostatenhed, sørg for at have en klimaenhed i home assistant"
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "description": "Opdater dine Better Thermostat indstillinger\n\n**Detaljerede oplysninger:** {docs_url}",
+        "data": {
+          "name": "Navn",
+          "thermostat": "Den rigtige termostat",
+          "temperature_sensor": "Temperatur måler",
+          "humidity_sensor": "Fugtighedssensor",
+          "window_sensors": "Vinduessensor",
+          "door_sensors": "Dørsensor",
+          "off_temperature": "Udendørstemperaturen, når termostaten skal slukker",
+          "tolerance": "Tolerancen for at forhindre, at termostaten tænder og slukker for ofte.",
+          "window_off_delay": "Forsinkelse, før termostaten slukker, når vinduet er åbent, og tændt, når vinduet er lukket",
+          "window_off_delay_after": "Forsinkelse, før termostaten tænder, når vinduet er lukket",
+          "door_off_delay": "Forsinkelse, før termostaten slukker, når døren er åben",
+          "door_off_delay_after": "Forsinkelse, før termostaten tænder, når døren er lukket",
+          "outdoor_sensor": "Har du en udendørsføler, kan du bruge den til at få udetemperaturen",
+          "weather": "Din vejrentitet for at få udendørstemperaturen",
+          "target_temp_min": "Mål minimum temperatur",
+          "target_temp_max": "Mål maksimum temperatur",
+          "target_temp_step": "Trin for måltemperatur",
+          "presets": "Aktiverede forudindstillinger",
+          "valve_maintenance": "Hvis din termostat ikke har nogen egen vedligeholdelsestilstand, kan du bruge denne",
+          "calibration": "Den slags kalibrering",
+          "heat_auto_swapped": "Hvis auto betyder varme til din TRV, og du ønsker at bytte den",
+          "child_lock": "Ignorer alle input på TRV som en børnesikring",
+          "homematicip": "Hvis du bruger HomematicIP, bør du aktivere dette for at bremse anmodningerne for at forhindre arbejdscyklus"
+        },
+        "data_description": {
+          "presets": "Vælg de forudindstillinger, der skal være tilgængelige for denne termostat."
+        }
+      },
+      "advanced": {
+        "description": "Avanceret konfiguration {trv}\n\n**Detaljerede oplysninger:** {docs_url}",
+        "data": {
+          "protect_overheating": "Overophedningsbeskyttelse?",
+          "heat_auto_swapped": "Hvis auto betyder varme for din TRV og du vil bytte det",
+          "child_lock": "Ignorer alle input på TRV som en børnesikring",
+          "homematicip": "Hvis du bruger HomematicIP, bør du aktivere dette for at bremse anmodningerne for at forhindre arbejdscyklus",
+          "valve_maintenance": "Hvis din termostat ikke har nogen egen vedligeholdelsestilstand, kan du bruge denne",
+          "calibration": "Den slags kalibrering du vil bruge",
+          "calibration_mode": "Kalibreringstilstand",
+          "no_off_system_mode": "Hvis din TRV ikke kan håndtere den slukkede tilstand, kan du aktivere denne for at bruge måltemperatur 5°C i stedet"
+        },
+        "data_description": {
+          "protect_overheating": "Nogle TRV'er lukker ikke ventilen helt, når temperaturen er nået. Eller radiatoren har meget hvilevarme. Dette kan forårsage overophedning. Denne mulighed kan forhindre dette.",
+          "calibration_mode": "Hvordan kalibreringen skal beregnes\n***Normal***: I denne tilstand er TRV's interne temperaturføler fikseret af den eksterne temperaturføler.\n***Aggressiv***: I denne tilstand er TRV's interne temperaturføler fikseret af den eksterne temperaturføler, men indstillet meget lavere/højere for at få et hurtigere løft.\n***AI-tidsbaseret***: I denne tilstand er TRV's interne temperatursensor fastsat af den eksterne temperatursensor, men værdien beregnes af en brugerdefineret algoritme for at forbedre TRV's interne algoritme.",
+          "calibration": "Hvordan kalibreringen skal anvendes på TRV (Target temp or offset)\n***Måltemperaturbaseret***: Anvend kalibreringen til måltemperaturen.\n***Offset-baseret***: Anvend kalibreringen til offset."
+        }
+      }
+    },
+    "error": {
+      "failed": "Noget gik galt.",
+      "no_name": "Indtast venligst et navn.",
+      "no_heater": "Vælg venligst mindst én rigtig termostat.",
+      "no_off_mode": "Din enhed er meget speciel og har ingen slukket tilstand :(\nDet virker alligevel, men du skal oprette en automatisering, der passer til dine specialer baseret på enhedsbegivenhederne",
+      "target_temp_min_above_max": "Mål minimumstemperaturen må ikke overstige mål maksimumstemperaturen.",
+      "no_outside_temp": "Du har ingen udetemperaturføler. Better Thermostat vil bruge vejret i stedet.",
+      "no_data": "Ingen data blev modtaget. Prøv venligst igen."
+    }
+  },
+  "issues": {
+    "missing_entity": {
+      "title": "BT: {name} - relateret enhed mangler",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Den relaterede {entity} mangler",
+            "description": "Årsagen til dette er, at entiteten ({entity}) ikke er tilgængelig i din Home Assistant.\n\nDu kan rette op på dette ved at kontrollere, om enhedens batteri er fuld, eller tilslutte den til HA igen. Sørg for, at entiteten er tilbage i HA, før du fortsætter."
+          }
+        }
+      }
+    },
+    "degraded_mode": {
+      "title": "BT: {name} - sensorfejl: {sensors} kører i nedsat tilstand",
+      "description": "Better Thermostat kører i nedsat tilstand, fordi nogle sensorer ikke er tilgængelige: {sensors}\n\nTermostaten vil fortsætte med at fungere med reduceret funktionalitet. For eksempel:\n- Hvis rumtemperatursensoren ikke er tilgængelig, bruges TRV'ens interne sensor i stedet.\n- Hvis vinduesensorer ikke er tilgængelige, antages vinduer at være lukkede.\n- Hvis udendørs-/vejrsensorer ikke er tilgængelige, vil opvarmning altid være aktiveret.\n\nKontroller, om de berørte enheder har batteriproblemer eller forbindelsesproblemer."
+    },
+    "invalid_window_state": {
+      "title": "BT: {name} - ugyldig vinduesensortilstand",
+      "description": "Vinduesensoren for Better Thermostat {name} rapporterede en ukendt tilstand: {state}.\n\nForventede tilstande er: 'on', 'off', 'true', 'false', 'open', 'closed'.\n\nKontroller din vinduesensorkonfiguration."
+    },
+    "invalid_door_state": {
+      "title": "BT: {name} - ugyldig dørsensortilstand",
+      "description": "Dørsensoren for Better Thermostat {name} rapporterede en ukendt tilstand: {state}.\n\nForventede tilstande er: 'on', 'off', 'true', 'false', 'open', 'closed'.\n\nKontroller venligst konfigurationen af din dørsensor."
+    },
+    "invalid_external_temperature": {
+      "title": "BT: {name} - ugyldig ekstern temperatur",
+      "description": "Den eksterne temperaturføler for Better Thermostat {name} rapporterede en usandsynlig værdi: {value}.\n\nAflæsningen lå uden for det sandsynlige interval og blev ignoreret. Kontroller din temperaturfølerkonfiguration."
+    }
+  },
+  "services": {
+    "run_valve_maintenance": {
+      "name": "Kør ventilvedligeholdelse nu",
+      "description": "Kører ventilvedligeholdelsescyklussen for denne Better Thermostat-enhed med det samme."
+    },
+    "reset_heating_power": {
+      "name": "Nulstil opvarmningskraft",
+      "description": "Nulstil opvarmningskraft til standardværdi."
+    },
+    "reset_pid_learnings": {
+      "name": "Nulstil PID-læring",
+      "description": "Rydder al lært PID-tilstand for denne enhed.",
+      "fields": {
+        "apply_pid_defaults": {
+          "name": "Anvend PID-standardværdier efter nulstilling",
+          "description": "Hvis aktiveret, forudfyldes de aktuelle målintervaller med PID-standardforstærkninger (kp/ki/kd). Du kan tilsidesætte standardværdierne nedenfor."
+        },
+        "defaults_kp": {
+          "name": "Standard-kp",
+          "description": "Proportionalforstærkning, der sættes efter nulstilling (falder tilbage til BalanceParams.kp, hvis ikke angivet)."
+        },
+        "defaults_ki": {
+          "name": "Standard-ki",
+          "description": "Integralforstærkning, der sættes efter nulstilling (falder tilbage til BalanceParams.ki, hvis ikke angivet)."
+        },
+        "defaults_kd": {
+          "name": "Standard-kd",
+          "description": "Differentialforstærkning, der sættes efter nulstilling (falder tilbage til BalanceParams.kd, hvis ikke angivet)."
+        }
+      }
+    }
+  },
+  "selector": {
+    "presets": {
+      "options": {
+        "eco": "Eco",
+        "away": "Ude",
+        "boost": "Boost",
+        "comfort": "Komfort",
+        "home": "Hjemme",
+        "sleep": "Søvn",
+        "activity": "Aktivitet"
+      }
+    },
+    "target_temp_min": {
+      "options": {
+        "auto": "Automatisk",
+        "min_max_0": "0 °C",
+        "min_max_1": "1 °C",
+        "min_max_2": "2 °C",
+        "min_max_3": "3 °C",
+        "min_max_4": "4 °C",
+        "min_max_5": "5 °C",
+        "min_max_6": "6 °C",
+        "min_max_7": "7 °C",
+        "min_max_8": "8 °C",
+        "min_max_9": "9 °C",
+        "min_max_10": "10 °C",
+        "min_max_11": "11 °C",
+        "min_max_12": "12 °C",
+        "min_max_13": "13 °C",
+        "min_max_14": "14 °C",
+        "min_max_15": "15 °C",
+        "min_max_16": "16 °C",
+        "min_max_17": "17 °C",
+        "min_max_18": "18 °C",
+        "min_max_19": "19 °C",
+        "min_max_20": "20 °C",
+        "min_max_21": "21 °C",
+        "min_max_22": "22 °C",
+        "min_max_23": "23 °C",
+        "min_max_24": "24 °C",
+        "min_max_25": "25 °C",
+        "min_max_26": "26 °C",
+        "min_max_27": "27 °C",
+        "min_max_28": "28 °C",
+        "min_max_29": "29 °C",
+        "min_max_30": "30 °C",
+        "min_max_31": "31 °C",
+        "min_max_32": "32 °C",
+        "min_max_33": "33 °C",
+        "min_max_34": "34 °C",
+        "min_max_35": "35 °C",
+        "min_max_36": "36 °C",
+        "min_max_37": "37 °C",
+        "min_max_38": "38 °C",
+        "min_max_39": "39 °C",
+        "min_max_40": "40 °C"
+      }
+    },
+    "target_temp_max": {
+      "options": {
+        "auto": "Automatisk",
+        "min_max_0": "0 °C",
+        "min_max_1": "1 °C",
+        "min_max_2": "2 °C",
+        "min_max_3": "3 °C",
+        "min_max_4": "4 °C",
+        "min_max_5": "5 °C",
+        "min_max_6": "6 °C",
+        "min_max_7": "7 °C",
+        "min_max_8": "8 °C",
+        "min_max_9": "9 °C",
+        "min_max_10": "10 °C",
+        "min_max_11": "11 °C",
+        "min_max_12": "12 °C",
+        "min_max_13": "13 °C",
+        "min_max_14": "14 °C",
+        "min_max_15": "15 °C",
+        "min_max_16": "16 °C",
+        "min_max_17": "17 °C",
+        "min_max_18": "18 °C",
+        "min_max_19": "19 °C",
+        "min_max_20": "20 °C",
+        "min_max_21": "21 °C",
+        "min_max_22": "22 °C",
+        "min_max_23": "23 °C",
+        "min_max_24": "24 °C",
+        "min_max_25": "25 °C",
+        "min_max_26": "26 °C",
+        "min_max_27": "27 °C",
+        "min_max_28": "28 °C",
+        "min_max_29": "29 °C",
+        "min_max_30": "30 °C",
+        "min_max_31": "31 °C",
+        "min_max_32": "32 °C",
+        "min_max_33": "33 °C",
+        "min_max_34": "34 °C",
+        "min_max_35": "35 °C",
+        "min_max_36": "36 °C",
+        "min_max_37": "37 °C",
+        "min_max_38": "38 °C",
+        "min_max_39": "39 °C",
+        "min_max_40": "40 °C"
+      }
+    },
+    "target_temp_step": {
+      "options": {
+        "auto_legacy": "Automatisk (gammel)",
+        "auto": "Automatisk",
+        "step_0_1": "0,1 °C",
+        "step_0_2": "0,2 °C",
+        "step_0_25": "0,25 °C",
+        "step_0_5": "0,5 °C",
+        "step_1_0": "1 °C"
+      }
+    },
+    "calibration_mode": {
+      "options": {
+        "heating_power_calibration": "AI tidsbaseret (standard)",
+        "default": "Kun ekstern sensorforskydning",
+        "mpc_calibration": "MPC forudsigende (beta)",
+        "mpc_v2_calibration": "(AI) MPC v2 (QP + Kalman, eksperimentel)",
+        "fix_calibration": "Aggressiv",
+        "tpi_calibration": "TPI-regulator",
+        "pid_calibration": "PID-regulator",
+        "no_calibration": "Ingen kalibrering"
+      }
+    },
+    "calibration_type": {
+      "options": {
+        "direct_valve_based": "Direkte ventilstyring",
+        "target_temp_based": "Baseret på måltemperatur",
+        "local_calibration_based": "Baseret på forskydning"
+      }
+    },
+    "mpc_v2_plant_preset": {
+      "options": {
+        "auto": "Automatisk (brug den lærte varmetabsrate)",
+        "small_room": "Lille rum (~10 m², hurtig reaktion)",
+        "medium_room": "Mellemstort rum (~20 m², standard)",
+        "large_room": "Stort rum (~40 m², langsom klimaskærm)"
+      }
+    }
+  },
+  "entity": {
+    "number": {
+      "pid_kp": {
+        "name": "{trv_name} PID Kp (proportional)"
+      },
+      "pid_ki": {
+        "name": "{trv_name} PID Ki (integral)"
+      },
+      "pid_kd": {
+        "name": "{trv_name} PID Kd (differentiel)"
+      },
+      "pid_kp_no_trv": {
+        "name": "PID Kp (proportional)"
+      },
+      "pid_ki_no_trv": {
+        "name": "PID Ki (integral)"
+      },
+      "pid_kd_no_trv": {
+        "name": "PID Kd (differentiel)"
+      },
+      "preset_eco": {
+        "name": "Eco"
+      },
+      "preset_eco_min": {
+        "name": "Eco Min"
+      },
+      "preset_eco_max": {
+        "name": "Eco Max"
+      },
+      "preset_away": {
+        "name": "Ude"
+      },
+      "preset_away_min": {
+        "name": "Ude Min"
+      },
+      "preset_away_max": {
+        "name": "Ude Max"
+      },
+      "preset_boost": {
+        "name": "Boost"
+      },
+      "preset_boost_min": {
+        "name": "Boost Min"
+      },
+      "preset_boost_max": {
+        "name": "Boost Max"
+      },
+      "preset_comfort": {
+        "name": "Komfort"
+      },
+      "preset_comfort_min": {
+        "name": "Komfort Min"
+      },
+      "preset_comfort_max": {
+        "name": "Komfort Max"
+      },
+      "preset_home": {
+        "name": "Hjemme"
+      },
+      "preset_home_min": {
+        "name": "Hjemme Min"
+      },
+      "preset_home_max": {
+        "name": "Hjemme Max"
+      },
+      "preset_sleep": {
+        "name": "Søvn"
+      },
+      "preset_sleep_min": {
+        "name": "Søvn Min"
+      },
+      "preset_sleep_max": {
+        "name": "Søvn Max"
+      },
+      "preset_activity": {
+        "name": "Aktivitet"
+      },
+      "preset_activity_min": {
+        "name": "Aktivitet Min"
+      },
+      "preset_activity_max": {
+        "name": "Aktivitet Max"
+      },
+      "valve_max_opening": {
+        "name": "{trv_name}: maksimal ventilåbning"
+      },
+      "valve_max_opening_no_trv": {
+        "name": "Maksimal ventilåbning"
+      }
+    },
+    "switch": {
+      "pid_auto_tune": {
+        "name": "{trv_name} PID-autotuning"
+      },
+      "pid_auto_tune_no_trv": {
+        "name": "PID-autotuning"
+      },
+      "child_lock": {
+        "name": "{trv_name} Børnesikring"
+      },
+      "child_lock_no_trv": {
+        "name": "Børnesikring"
+      }
+    },
+    "sensor": {
+      "logbook": {
+        "state": {
+          "window_open": "slukket fordi et vindue blev åbnet",
+          "window_close": "genoptog opvarmning fordi et vindue blev lukket",
+          "summer_mode_on": "slukket fordi udendørstemperaturen er for høj",
+          "summer_mode_off": "genoptog opvarmning fordi udendørstemperaturen faldt",
+          "degraded_mode_entered": "gik i degraderet tilstand fordi nogle sensorer er utilgængelige",
+          "degraded_mode_resolved": "forlod degraderet tilstand fordi alle sensorer er tilgængelige",
+          "door_open": "turned off because a door was opened",
+          "door_close": "resumed heating because a door was closed"
+        }
+      },
+      "external_temp_ema": {
+        "name": "Temperatur-EMA"
+      },
+      "external_temp_ema_1h": {
+        "name": "Temperatur-EMA (1 time)"
+      },
+      "temp_slope": {
+        "name": "Temperaturændring"
+      },
+      "heating_power": {
+        "name": "Varmeydelse"
+      },
+      "heat_loss": {
+        "name": "Varmetab"
+      },
+      "virtual_temp": {
+        "name": "Virtuel temperatur"
+      },
+      "mpc_gain": {
+        "name": "MPC-varmeforstærkning"
+      },
+      "mpc_loss": {
+        "name": "MPC-varmetab"
+      },
+      "mpc_ka": {
+        "name": "MPC-isolering (Ka)"
+      },
+      "pid_kp": {
+        "name": "PID Kp"
+      },
+      "pid_ki": {
+        "name": "PID Ki"
+      },
+      "pid_kd": {
+        "name": "PID Kd"
+      },
+      "pid_output": {
+        "name": "PID-udgang"
+      },
+      "pid_error": {
+        "name": "PID-afvigelse"
+      },
+      "solar_intensity": {
+        "name": "Solvarmetilskud"
+      }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "heating_active": "Termostat skifter til opvarmning",
+      "heating_stopped": "Termostat stopper opvarmning",
+      "humidity_high": "Luftfugtighed overstiger grænseværdi",
+      "window_opened": "Vindue åbnet",
+      "window_closed": "Vindue lukket",
+      "battery_low": "Batteri lavt",
+      "device_error": "Enhedsfejl registreret",
+      "target_temp_reached": "Måltemperatur nået",
+      "hvac_mode_changed": "HVAC-tilstand ændret",
+      "current_temperature_changed": "Aktuel temperatur ændret",
+      "current_humidity_changed": "Aktuel luftfugtighed ændret"
+    },
+    "condition_type": {
+      "is_hvac_mode": "Termostaten er indstillet til en bestemt HVAC-tilstand",
+      "is_hvac_action": "Termostaten udfører en bestemt HVAC-handling"
+    },
+    "action_type": {
+      "set_hvac_mode": "Indstil HVAC-tilstand",
+      "set_temperature": "Indstil måltemperatur"
+    }
+  }
+}

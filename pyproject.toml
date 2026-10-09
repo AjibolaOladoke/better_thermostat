@@ -1,0 +1,162 @@
+[project]
+name = "better-thermostat"
+version = "1.9.2"  # keep in sync with manifest.json
+description = "Better Thermostat — Home Assistant custom integration for smart TRV control"
+requires-python = ">=3.14.2"  # floor inherited from Home Assistant 2026.7.x
+dependencies = ["homeassistant>=2026.7.2"]
+
+[dependency-groups]
+dev = [
+    "daqp>=0.8.7",  # QP solver used by MPC v2; tests/unit/mpc_v2 skips without it
+    "pytest>=9",
+    "pytest-asyncio>=1.4.0",
+    "pytest-homeassistant-custom-component>=0.13.346",
+    "pre-commit>=4.6.0",
+    "codespell>=2.4.3",
+    "pyrefly>=1.1.1",
+    "ruff>=0.15.22",
+    "yamllint>=1.38.0",
+]
+
+[tool.uv]
+package = false  # HA custom integration, not an installable package
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+exclude = [
+    ".venv",
+    ".git",
+    ".tox",
+    "docs",
+    "venv",
+    "bin",
+    "lib",
+    "deps",
+    "build",
+    "__pycache__",
+    "assets",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "W",      # pycodestyle warnings
+    "UP",     # pyupgrade
+    "D",      # pydocstyle (docstrings)
+    "D417",   # Require documented args to match the signature (numpy convention disables this by default)
+    "C4",     # flake8-comprehensions
+    "PL",     # pylint
+    "RUF100", # unused noqa directives
+    "I",      # isort
+]
+ignore = [
+    "E501",   # Line too long - handled by formatter where possible
+    "E203",   # Whitespace before ':' - conflicts with black/ruff formatter
+    "D100",   # Missing docstring in public module
+    "D104",   # Missing docstring in public package
+    "D202",   # No blank lines allowed after function docstring
+    "PLR2004", # Magic value comparison
+    "PLR0915", # Too many statements
+    "PLR0912", # Too many branches
+    "PLR0913", # Too many arguments
+    "PLR0911", # Too many return statements
+    "PLC0415", # Import outside top level
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+# Test code does not need docstrings on every function/class/method.
+"tests/**" = ["D"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components.better_thermostat", "tests"]
+force-sort-within-sections = true
+combine-as-imports = true
+split-on-trailing-comma = false
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = [
+    # Upstream Home Assistant warning triggered during test imports.
+    "ignore:Inheritance class HomeAssistantApplication from web\\.Application is discouraged:DeprecationWarning",
+]
+
+[tool.pyright]
+# Don't use include - it changes the root! Instead, exclude everything except custom_components
+exclude = [
+    "tests",
+    "docs",
+    "scripts",
+    "blueprints",
+    "_sass",
+    "assets",
+    "**/__pycache__",
+    ".git",
+    ".venv",
+    "*.md",
+    "*.yml",
+    "*.yaml",
+]
+reportMissingImports = true
+reportMissingTypeStubs = false
+pythonVersion = "3.14"
+
+[tool.pyrefly]
+python-version = "3.14"
+project-includes = ["custom_components/better_thermostat"]
+min-severity = "error"
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/number.py"
+errors = { bad-override-mutable-attribute = false }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/utils/calibration/*.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/model_fixes/types.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/model_fixes/TS0601.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/model_fixes/TS0601_thermostat.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/model_fixes/ME167.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/model_fixes/COZB0001.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/model_fixes/BHT-002-GCLZB.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/model_fixes/SEA801-Zigbee_SEA802-Zigbee.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/trv.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/utils/telemetry.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }
+
+[[tool.pyrefly.sub-config]]
+matches = "custom_components/better_thermostat/utils/retry.py"
+errors = { implicit-any-parameter = true, implicit-any-attribute = true, implicit-any-type-argument = true, implicit-any-empty-container = true, missing-override-decorator = true }

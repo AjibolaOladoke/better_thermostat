@@ -1,0 +1,201 @@
+"""End-to-end tests: config entry to real device writes.
+
+These tests exist because the unit suite mocks the entity: a control
+path that silently writes nothing keeps every unit test green. Here a
+real entry is set up against a simulated TRV and the assertions are the
+service calls that arrive at the device.
+"""
+
+from homeassistant.components.climate.const import ATTR_HVAC_ACTION
+from homeassistant.const import ATTR_TEMPERATURE
+from homeassistant.core import State
+from homeassistant.helpers import entity_registry as er
+from pytest_homeassistant_custom_component.common import mock_restore_cache
+
+from .conftest import (
+    DOMAIN,
+    SENSOR_ID,
+    WINDOW_ID,
+    make_entry,
+    setup_entry,
+    wait_for,
+    wait_for_startup,
+)
+
+BT_ENTITY = "climate.bt_test"
+
+
+def _room_sensor(hass, value="18.0"):
+    """Set the external room temperature sensor to ``value`` (°C)."""
+    hass.states.async_set(SENSOR_ID, value, {"unit_of_measurement": "°C"})
+
+
+async def test_setup_creates_the_entity_and_syncs_the_trv(hass, fake_trv):
+    """Startup ends with a real setpoint write at the device."""
+    _room_sensor(hass)
+    entry = make_entry()
+    await setup_entry(hass, entry)
+    await wait_for_startup(hass, entry)
+
+    state = hass.states.get(BT_ENTITY)
+    assert state is not None
+    assert state.state == "heat"
+
+    # The initial sync wrote a setpoint through the climate service.
+    assert await wait_for(hass, lambda: fake_trv.set_temperature_calls)
+    written = fake_trv.set_temperature_calls[-1]
+    assert 5.0 <= written <= 30.0
+
+
+async def test_window_open_turns_the_trv_off(hass, fake_trv):
+    """A window-open event reaches the device as an OFF command."""
+    _room_sensor(hass)
+    hass.states.async_set(WINDOW_ID, "off")
+    entry = make_entry(with_window=True)
+    await setup_entry(hass, entry)
+    await wait_for_startup(hass, entry)
+    assert await wait_for(hass, lambda: fake_trv.set_temperature_calls)
+
+    hass.states.async_set(WINDOW_ID, "on")
+    assert await wait_for(hass, lambda: "off" in fake_trv.set_hvac_mode_calls)
+
+    bt_state = hass.states.get(BT_ENTITY)
+    assert bt_state.attributes.get("window_open") is True
+
+
+async def test_restored_target_temperature_survives_a_restart(hass, fake_trv):
+    """The restored target temperature drives the first sync."""
+    mock_restore_cache(
+        hass,
+        [State(BT_ENTITY, "heat", {ATTR_TEMPERATURE: 23.5, ATTR_HVAC_ACTION: "idle"})],
+    )
+    _room_sensor(hass)
+    entry = make_entry()
+    await setup_entry(hass, entry)
+    await wait_for_startup(hass, entry)
+
+    assert await wait_for(hass, lambda: fake_trv.set_temperature_calls)
+    state = hass.states.get(BT_ENTITY)
+    assert state.attributes.get(ATTR_TEMPERATURE) == 23.5
+
+
+async def test_unload_and_reload_the_entry(hass, fake_trv):
+    """Unloading stops the entry cleanly; reloading controls again.
+
+    The entity runs several background tasks (control queue, window
+    queue, keepalive) and many listeners — the classic leak class for
+    custom components lives exactly here.
+    """
+    from homeassistant.config_entries import ConfigEntryState
+
+    _room_sensor(hass)
+    entry = make_entry()
+    await setup_entry(hass, entry)
+    await wait_for_startup(hass, entry)
+
+    assert await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert entry.state is ConfigEntryState.NOT_LOADED
+    bt_state = hass.states.get(BT_ENTITY)
+    assert bt_state is None or bt_state.state == "unavailable"
+
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    await wait_for_startup(hass, entry)
+    assert hass.states.get(BT_ENTITY).state == "heat"
+
+    # The device is already converged, so the restart sync rightly writes
+    # nothing; a target change proves the reloaded entry controls again.
+    fake_trv.set_temperature_calls.clear()
+    await hass.services.async_call(
+        "climate",
+        "set_temperature",
+        {"entity_id": BT_ENTITY, "temperature": 23.5},
+        blocking=True,
+    )
+    assert await wait_for(hass, lambda: fake_trv.set_temperature_calls)
+
+
+async def test_climate_entity_id_follows_device_name_after_rename(hass, fake_trv):
+    """Renaming the device renames the climate (and sensor) entity_id to match.
+
+    HA's entity registry reuses the existing entry on reload (unique id ==
+    config entry id), so without an explicit rename the entity_id is frozen
+    at first creation while only the friendly name follows the device.
+    Blueprints that reference ``climate.bt_<room>`` then miss the entity.
+    """
+    _room_sensor(hass)
+    entry = make_entry(name="Livingroom")
+    await setup_entry(hass, entry)
+    await wait_for_startup(hass, entry)
+
+    registry = er.async_get(hass)
+    climate_key = ("climate", DOMAIN, entry.entry_id)
+    sensor_key = (DOMAIN, entry.entry_id + "_external_temp_ema")
+    assert registry.async_get_entity_id(*climate_key) == "climate.livingroom"
+    assert (
+        registry.async_get_entity_id("sensor", *sensor_key)
+        == "sensor.livingroom_temperature_ema"
+    )
+
+    # The device is renamed; the entity_id must follow to climate.bt_livingroom.
+    hass.config_entries.async_update_entry(
+        entry, data={**entry.data, "name": "BT Livingroom"}
+    )
+    await hass.async_block_till_done()
+    await wait_for_startup(hass, entry)
+
+    assert registry.async_get_entity_id(*climate_key) == "climate.bt_livingroom"
+    assert (
+        registry.async_get_entity_id("sensor", *sensor_key)
+        == "sensor.bt_livingroom_temperature_ema"
+    )
+    assert hass.states.get("climate.bt_livingroom") is not None
+
+
+async def test_entity_ids_the_user_chose_survive_a_restart(hass, fake_trv):
+    """A restart leaves the ids in the registry alone, whoever wrote them.
+
+    An entity_id is the user's to set, and the ones seeded here are the
+    form somebody who named BT's entities themselves holds. Setting the
+    entry up finds them already in the registry, which is what a restart
+    looks like from the integration's side.
+
+    Both platforms are seeded: the climate entity derives its id from the
+    entry, the auxiliary ones from the device, and those are two different
+    code paths.
+    """
+    _room_sensor(hass)
+    entry = make_entry(name="Livingroom")
+    entry.add_to_hass(hass)
+
+    registry = er.async_get(hass)
+    registry.async_get_or_create(
+        "climate",
+        DOMAIN,
+        entry.entry_id,
+        config_entry=entry,
+        suggested_object_id="livingroom_thermostat",
+    )
+    registry.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        entry.entry_id + "_external_temp_ema",
+        config_entry=entry,
+        suggested_object_id="livingroom_thermostat_ema",
+    )
+
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    await wait_for_startup(hass, entry)
+
+    assert (
+        registry.async_get_entity_id("climate", DOMAIN, entry.entry_id)
+        == "climate.livingroom_thermostat"
+    )
+    assert (
+        registry.async_get_entity_id(
+            "sensor", DOMAIN, entry.entry_id + "_external_temp_ema"
+        )
+        == "sensor.livingroom_thermostat_ema"
+    )

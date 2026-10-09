@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+# Bump Home Assistant to the latest compatible release in the lockfile.
+uv lock --upgrade-package homeassistant
+uv sync
+
+echo "Done."

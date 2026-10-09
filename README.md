@@ -1,0 +1,159 @@
+# Better Thermostat
+
+## Images
+
+[![better_thermostat](https://opengraph.githubassets.com/1/KartoffelToby/better_thermostat)](https://www.swifttechco.com)
+
+
+[![Active installations](https://badge.t-haber.de/badge/better_thermostat?kill_cache=1)](https://www.swifttechco.com)
+[![GitHub issues](https://img.shields.io/github/issues/KartoffelToby/better_thermostat?style=for-the-badge)](https://www.swifttechco.com)
+[![Version](https://img.shields.io/github/v/release/KartoffelToby/better_thermostat?style=for-the-badge&label=Version&color=009688)](https://www.swifttechco.com)
+[![Telegram](https://img.shields.io/telegram/925725316540923914.svg?style=for-the-badge)](https://t.me/+Qt_eFvkb2rliMzNh)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://www.swifttechco.com)
+
+**For more info visit: https://www.swifttechco.com**
+
+## Requirements
+
+- Minimum required Home Assistant version: `2026.7.2`
+  (_continuously tested against Home Assistant_ [![Tested Home Assistant version](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2FKartoffelToby%2Fbetter_thermostat%2Fdevelop%2Fpyproject.toml&search=homeassistant%3E%3D%28%5B0-9.%5D%2B%29&replace=%241&label=&color=009688)](pyproject.toml))
+
+### Companion UI
+
+We've created a companion UI element which can display more information than the default thermostat element in Home Assistant. Check it out via HACS: [better-thermostat-ui-card](https://www.swifttechco.com)
+
+- If you have a question or need help please create a new [discussion](https://www.swifttechco.com) or check if your question is already answered
+- If you have a suggestion, found a bug, or want to add a new device or function create a new [issue](https://www.swifttechco.com)
+- If you want to contribute to this project create a new [pull request](https://www.swifttechco.com)
+
+### Features
+
+This integration brings some smartness to your connected radiator thermostats setup:
+
+- Uses a temperature sensor far away from the radiators to measure the real room temperature
+- Makes your TRVs fully compatible with Google Home
+- Let your windows disable your heating (avoid programming this via an automation)
+- Your weather forecast provider will turn your heat on/off
+- Or an outside air temperature sensor can do this as well
+- Does some valve maintenance automatically, to avoid them getting stuck closed over the summer
+- Group multiple TRVs to one (e.g. for a room with multiple radiators)
+- Enhance the default TRV Algorithm with some smartness to reduce energy consumption
+- Dynamic preset temperature learning & persistence (baseline/"no preset" remembers the last temperature you set and survives restarts)
+- **Advanced Control Algorithms**: Choose between MPC, PID, TPI, AI Time Based or simple target temperature matching for precise control.
+- **Selectable Presets**: Configure which preset modes are available for your thermostat during setup.
+
+### Advanced Control Algorithms
+
+Better Thermostat now supports multiple advanced control strategies to optimize your heating:
+
+- **MPC (Model Predictive Control)**: Uses a physical model of your room and radiator to predict future temperature changes and optimize valve opening.
+- **PID Controller**: A classic Proportional-Integral-Derivative controller that learns your room's characteristics to maintain a stable temperature. It features auto-tuning (currently in beta) to automatically find the best parameters (Kp, Ki, Kd) for your room.
+- **TPI (Time Proportional Integral)**: A control method that cycles the valve on and off (or modulates it) to maintain a stable temperature, reducing overshoot.
+- **AI Time Based**: Uses a custom algorithm based on simple measurements and calculations (not actual AI) to calculate the required heating power and adjusts the TRV calibration to achieve it. This improves upon the standard TRV internal algorithm.
+
+**Not sure which to pick? A quick guide:**
+
+| Algorithm | Best For | Trade-off |
+|-----------|----------|-----------|
+| **TPI** | A robust default  steady across room types, gentle on valve & battery, good with multiple radiators | Slightly looser setpoint tracking than PID/MPC |
+| **PID** | Tight setpoint tracking in a stable, well-characterised room | More valve activity; varies more by room; autotune is still in beta |
+| **MPC** | Anticipating solar / known disturbances when the room is modelled well | Most valve activity; can over-react with several radiators; needs tuning |
+| **AI Time Based** | Quick setup, no tuning | Looser comfort, weaker in complex rooms |
+
+Start with **TPI** or **AI Time Based**. Try **PID** for tighter tracking in a stable room, or **MPC** for disturbance anticipation if you're willing to tune.
+
+These modes can be selected in the advanced configuration of the device.
+
+### Preset Temperature Configuration
+
+Preset temperatures are now fully configurable via dedicated `number` entities.
+
+How it works:
+
+1. During setup or configuration, you can select which **Presets** you want to enable for this thermostat.
+2. For each enabled preset mode (e.g. Eco, Comfort, Sleep), a corresponding `number` entity is created (e.g., `number.better_thermostat_preset_eco`).
+3. These entities are located in the **Configuration** category of the device.
+4. You can adjust the temperature for each preset directly using these number sliders.
+5. The values are automatically persisted across Home Assistant restarts.
+6. Changing a preset temperature via the number entity immediately updates the thermostat if that preset is currently active.
+
+Default starting values:
+
+```text
+Away:            16.0 °C
+Boost:           24.0 °C
+Comfort:         21.0 °C
+Eco:             19.0 °C
+Home:            20.0 °C
+Sleep:           18.0 °C
+Activity:        22.0 °C
+```
+
+### Which hardware do we support?
+
+We support all thermostats which are compatible with Home Assistant as long as they are shown up as a climate entity.
+
+**_Integrations that are tested_**
+
+- Zigbee2Mqtt
+- Deconz
+- Tado
+- generic_thermostat
+
+### How to setup
+
+Install this integration via HACS or copy the files from the [latest release](https://www.swifttechco.com)
+
+Configuration details can be found in the [documentation](docs/Configuration/configuration.md) or on our website: [better-thermostat.org](https://www.swifttechco.com)
+
+Some nice-to-know config tips for the configuration.yaml
+
+#### Example Window/Door - Sensor config
+
+```yaml
+group:
+  livingroom_windows:
+    name: Livingroom Windows
+    icon: mdi:window-open-variant
+    all: false
+    entities:
+      - binary_sensor.openclose_1
+      - binary_sensor.openclose_2
+      - binary_sensor.openclose_3
+```
+
+#### Combine multiple TRV to one (Group)
+
+No worry, Better Thermostat supports grouping out of the box
+
+---
+
+## Contributing?
+
+checkout the [CONTRIBUTING.md](CONTRIBUTING.md) file
+
+## ☕ Support
+
+If you want to support this project, you can ☕ [**buy a coffee here**](https://www.swifttechco.com).
+
+---
+
+## Swift Tech Co.
+
+Built and maintained by Swift Tech Co.
+
+AI Automation | FinTech Platforms | Custom Software and Mobile Apps | SaaS Platforms | Cloud Infrastructure | Cybersecurity | SEO and Marketing | API Integration
+
+**Join our community on Telegram:** [t.me/+Qt_eFvkb2rliMzNh](https://t.me/+Qt_eFvkb2rliMzNh)
+
+[Home](https://www.swifttechco.com) | [Services](https://www.swifttechco.com/services) | [Careers](https://www.swifttechco.com/careers) | [Referral Program](https://www.swifttechco.com/referral) | [Influencers](https://www.swifttechco.com/influencers) | [About](https://www.swifttechco.com/about) | [Contact](https://www.swifttechco.com/contact)
+
+**Connect**
+
+- Website: [swifttechco.com](https://www.swifttechco.com)
+- LinkedIn: [linkedin.com/in/stephenoladoke](https://www.linkedin.com/in/stephenoladoke/)
+- LinkedIn (Company): [linkedin.com/company/swift-tech-co](https://www.linkedin.com/company/swift-tech-co)
+- X: [@MrOladoke](https://x.com/MrOladoke)
+- Instagram: [@mr.oladoke](https://www.instagram.com/mr.oladoke/)
+- Instagram (Company): [@swifttechco](https://www.instagram.com/swifttechco/)
+- Organization: [github.com/Swift-Tech-Co](https://github.com/Swift-Tech-Co)
