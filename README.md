@@ -1,17 +1,12 @@
-# Better Thermostat
+# better_thermostat
+
+## What This Is
+
+We keep a working index for product and engineering, and better_thermostat is the entry that collects our notes, examples and fixes. It reflects how Swift Tech Co. actually uses this in builds and client work.
 
 ## Images
 
-[![better_thermostat](https://opengraph.githubassets.com/1/KartoffelToby/better_thermostat)](https://www.swifttechco.com)
-
-
-[![Active installations](https://badge.t-haber.de/badge/better_thermostat?kill_cache=1)](https://www.swifttechco.com)
-[![GitHub issues](https://img.shields.io/github/issues/KartoffelToby/better_thermostat?style=for-the-badge)](https://www.swifttechco.com)
-[![Version](https://img.shields.io/github/v/release/KartoffelToby/better_thermostat?style=for-the-badge&label=Version&color=009688)](https://www.swifttechco.com)
-[![Telegram](https://img.shields.io/telegram/925725316540923914.svg?style=for-the-badge)](https://t.me/+Qt_eFvkb2rliMzNh)
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://www.swifttechco.com)
-
-**For more info visit: https://www.swifttechco.com**
+[![better_thermostat](images/preview.png)](https://github.com/Swift-Tech-Co)
 
 ## Requirements
 
@@ -20,11 +15,11 @@
 
 ### Companion UI
 
-We've created a companion UI element which can display more information than the default thermostat element in Home Assistant. Check it out via HACS: [better-thermostat-ui-card](https://www.swifttechco.com)
+We've created a companion UI element which can display more information than the default thermostat element in Home Assistant. Check it out via HACS: better-thermostat-ui-card
 
-- If you have a question or need help please create a new [discussion](https://www.swifttechco.com) or check if your question is already answered
-- If you have a suggestion, found a bug, or want to add a new device or function create a new [issue](https://www.swifttechco.com)
-- If you want to contribute to this project create a new [pull request](https://www.swifttechco.com)
+- If you have a question or need help please create a new discussion or check if your question is already answered
+- If you have a suggestion, found a bug, or want to add a new device or function create a new issue
+- If you want to contribute to this project create a new pull request
 
 ### Features
 
@@ -102,9 +97,9 @@ We support all thermostats which are compatible with Home Assistant as long as t
 
 ### How to setup
 
-Install this integration via HACS or copy the files from the [latest release](https://www.swifttechco.com)
+Install this integration via HACS or copy the files from the latest release
 
-Configuration details can be found in the [documentation](docs/Configuration/configuration.md) or on our website: [better-thermostat.org](https://www.swifttechco.com)
+Configuration details can be found in the [documentation](docs/Configuration/configuration.md) or on our website: better-thermostat.org
 
 Some nice-to-know config tips for the configuration.yaml
 
@@ -134,7 +129,7 @@ checkout the [CONTRIBUTING.md](CONTRIBUTING.md) file
 
 ## ☕ Support
 
-If you want to support this project, you can ☕ [**buy a coffee here**](https://www.swifttechco.com).
+If you want to support this project, you can ☕ **buy a coffee here**.
 
 ---
 
@@ -146,14 +141,22 @@ AI Automation | FinTech Platforms | Custom Software and Mobile Apps | SaaS Platf
 
 **Join our community on Telegram:** [t.me/+Qt_eFvkb2rliMzNh](https://t.me/+Qt_eFvkb2rliMzNh)
 
-[Home](https://www.swifttechco.com) | [Services](https://www.swifttechco.com/services) | [Careers](https://www.swifttechco.com/careers) | [Referral Program](https://www.swifttechco.com/referral) | [Influencers](https://www.swifttechco.com/influencers) | [About](https://www.swifttechco.com/about) | [Contact](https://www.swifttechco.com/contact)
+Home | Services | Careers | Referral Program | Influencers | About | Contact
 
 **Connect**
 
-- Website: [swifttechco.com](https://www.swifttechco.com)
+- Website: swifttechco.com
 - LinkedIn: [linkedin.com/in/stephenoladoke](https://www.linkedin.com/in/stephenoladoke/)
 - LinkedIn (Company): [linkedin.com/company/swift-tech-co](https://www.linkedin.com/company/swift-tech-co)
 - X: [@MrOladoke](https://x.com/MrOladoke)
 - Instagram: [@mr.oladoke](https://www.instagram.com/mr.oladoke/)
 - Instagram (Company): [@swifttechco](https://www.instagram.com/swifttechco/)
 - Organization: [github.com/Swift-Tech-Co](https://github.com/Swift-Tech-Co)
+
+## Sources
+
+Compiled and maintained from upstream [KartoffelToby/better_thermostat](https://github.com/KartoffelToby/better_thermostat) under permissive open-source license.
+
+---
+
+Maintained by [Swift Tech Co.](https://github.com/Swift-Tech-Co) - [Telegram](https://t.me/+Qt_eFvkb2rliMzNh)
