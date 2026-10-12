@@ -183,3 +183,11 @@ Compiled and maintained from upstream [KartoffelToby/better_thermostat](https://
 ---
 
 Maintained by [Swift Tech Co.](https://github.com/Swift-Tech-Co) - [Telegram](https://t.me/+Qt_eFvkb2rliMzNh)
+
+## Sources
+
+Compiled and maintained from upstream [KartoffelToby/better_thermostat](https://github.com/KartoffelToby/better_thermostat) under permissive open-source license.
+
+---
+
+Maintained by [Swift Tech Co.](https://github.com/Swift-Tech-Co) - [Telegram](https://t.me/+Qt_eFvkb2rliMzNh)
